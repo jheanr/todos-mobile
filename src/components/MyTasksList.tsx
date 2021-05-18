@@ -1,10 +1,16 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { FlatList, TouchableOpacity, View, Text, StyleSheet, FlatListProps } from 'react-native';
 
-function FlatListHeaderComponent() {
+type FlatListHeaderComponentProps = {
+  darkMode: boolean;
+}
+
+function FlatListHeaderComponent({ darkMode }: FlatListHeaderComponentProps) {
   return (
     <View>
-      <Text style={styles.header}>Minhas tasks</Text>
+      <Text style={darkMode ? [styles.header, styles.headerDark] : styles.header}>
+        Minhas tasks
+      </Text>
     </View>
   )
 }
@@ -17,9 +23,10 @@ interface MyTasksListProps {
   }[];
   onPress: (id: number) => void;
   onLongPress: (id: number) => void;
+  darkMode: boolean;
 }
 
-export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
+export function MyTasksList({ tasks, onLongPress, onPress, darkMode }: MyTasksListProps) {
   return (
     <FlatList
       data={tasks}
@@ -31,21 +38,35 @@ export function MyTasksList({ tasks, onLongPress, onPress }: MyTasksListProps) {
             activeOpacity={0.7}
             onPress={() => onPress(item.id)}
             onLongPress={() => onLongPress(item.id)}
-            style={item.done ? styles.taskButtonDone : styles.taskButton}
+            style={
+              (item.done && darkMode) ? [styles.taskButtonDone, styles.taskButtonDoneDark] :
+              (item.done && !darkMode) ? styles.taskButtonDone :
+              styles.taskButton
+            }
           >
             <View 
               testID={`marker-${index}`}
-              style={item.done ? styles.taskMarkerDone : styles.taskMarker}
+              style={
+                (item.done && darkMode) ? [styles.taskMarkerDone, styles.taskMarkerDoneDark] :
+                (item.done && !darkMode) ? styles.taskMarkerDone :
+                (!item.done && darkMode) ? [styles.taskMarker, styles.taskMarkerDark] :
+                styles.taskMarker
+              }
             />
             <Text 
-              style={item.done ? styles.taskTextDone : styles.taskText}
+              style={
+                (item.done && darkMode) ? [styles.taskTextDone, styles.taskTextDoneDark] :
+                (item.done && !darkMode) ? styles.taskTextDone :
+                (!item.done && darkMode) ? [styles.taskText, styles.taskTextDark] :
+                styles.taskText
+              }
             >
               {item.title}
             </Text>
           </TouchableOpacity>
         )
       }}
-      ListHeaderComponent={<FlatListHeaderComponent />}
+      ListHeaderComponent={<FlatListHeaderComponent darkMode={darkMode} />}
       ListHeaderComponentStyle={{
         marginBottom: 20
       }}
@@ -62,6 +83,9 @@ const styles = StyleSheet.create({
     color: '#3D3D4D',
     fontSize: 24,
     fontFamily: 'Poppins-SemiBold'
+  },
+  headerDark: {
+    color: '#565BFF'
   },
   taskButton: {
     flex: 1,
@@ -80,8 +104,14 @@ const styles = StyleSheet.create({
     borderColor: '#3D3D4D',
     marginRight: 10
   },
+  taskMarkerDark: {
+    borderColor: '#565BFF',
+  },
   taskText: {
     color: '#3D3D4D',
+  },
+  taskTextDark: {
+    color: '#E1E1E6',
   },
   taskButtonDone: {
     flex: 1,
@@ -93,6 +123,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center'
   },
+  taskButtonDoneDark: {
+    backgroundColor: 'rgba(33, 33, 54, 0.3)',
+  },
   taskMarkerDone: {
     height: 16,
     width: 16,
@@ -100,8 +133,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#273FAD',
     marginRight: 10
   },
+  taskMarkerDoneDark: {
+    backgroundColor: '#565BFF',
+  },
   taskTextDone: {
     color: '#A09CB1',
     textDecorationLine: 'line-through'
+  },
+  taskTextDoneDark: {
+    color: 'rgba(225, 225, 230, 0.6)'
   }
 })
